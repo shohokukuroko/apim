@@ -42,7 +42,7 @@ resource "azurerm_function_app" "function_app" {
 }
 
 resource "azurerm_api_management" "apim" {
-  name                = "my-apim"
+  name                = "my-apim-goks"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   publisher_email     = "admin@example.com"
@@ -51,16 +51,25 @@ resource "azurerm_api_management" "apim" {
 }
 
 resource "azurerm_api_management_api" "api" {
-  name                = "my-api"
+  name                = "HelloWorldAPI"
   resource_group_name = azurerm_resource_group.rg.name
   api_management_name = azurerm_api_management.apim.name
   revision            = "1"
-  display_name        = "Sample API"
-  path                = "sample"
+  display_name        = "HelloWorld API"
+  path                = "helloworld"
   protocols           = ["https"]
+  service_url         = azurerm_function_app.function.default_hostname
+}
 
-  import {
-    content_format = "swagger-link-json"
-    content_value  = "https://example.com/swagger.json" # Replace with your Swagger file URL
-  }
+# Outputs
+output "resource_group_name" {
+  value = azurerm_resource_group.rg.name
+}
+
+output "function_app_url" {
+  value = azurerm_function_app.function.default_hostname
+}
+
+output "apim_url" {
+  value = azurerm_api_management.apim.gateway_url
 }
