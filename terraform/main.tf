@@ -62,6 +62,47 @@ resource "azurerm_api_management_api" "api" {
   service_url         = "https://${azurerm_function_app.function_app.default_hostname}"
 }
 
+# APIM Security: Add API Key Policy
+resource "azurerm_api_management_api_operation" "api_operation" {
+  operation_id        = "getHelloWorld"
+  api_name            = azurerm_api_management_api.api.name
+  api_management_name = azurerm_api_management.apim.name
+  resource_group_name = azurerm_resource_group.rg.name
+  display_name        = "Get HelloWorld"
+  method              = "GET"
+  url_template        = "/"
+}
+
+resource "azurerm_api_management_api_policy" "api_policy" {
+  api_name            = azurerm_api_management_api.api.name
+  api_management_name = azurerm_api_management.apim.name
+  resource_group_name = azurerm_resource_group.rg.name
+
+  xml_content = <<EOT
+    <policies>
+      <inbound>
+        <base />
+        <set-header name="X-Frame-Options" exists-action="override">
+          <value>Deny</value>
+        </set-header>
+        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="Unauthorized">
+          <openid-config url="https://login.microsoftonline.com/{tenantId}/v2.0/.well-known/openid-configuration" />
+          <required-claims>
+            <claim name="aud">
+              <value>api://your-api-client-id</value>
+            </claim>
+          </required-claims>
+        </validate-jwt>
+      </inbound>
+      <backend>
+        <base />
+      </backend>
+      <outbound>
+        <base />
+      </outbound>
+    </policies>
+  EOT
+}
 # Outputs
 output "resource_group_name" {
   value = azurerm_resource_group.rg.name
