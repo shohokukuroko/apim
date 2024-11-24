@@ -61,3 +61,16 @@ resource "azurerm_api_management_api" "api" {
   protocols           = ["https"]
   service_url         = "https://${azurerm_function_app.function.default_hostname}"
 }
+
+# Outputs
+output "resource_group_name" {
+  value = azurerm_resource_group.rg.name
+}
+
+output "function_app_url" {
+  value = azurerm_function_app.function.default_hostname
+}
+
+output "apim_url" {
+  value = azurerm_api_management.apim.gateway_url
+}
