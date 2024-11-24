@@ -35,6 +35,7 @@ resource "azurerm_function_app" "function_app" {
   storage_account_name       = azurerm_storage_account.storage.name
   storage_account_access_key = azurerm_storage_account.storage.primary_access_key
   version                    = "~4"
+  https_only                 = true
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = "python"
     WEBSITE_RUN_FROM_PACKAGE = "1"
@@ -58,5 +59,5 @@ resource "azurerm_api_management_api" "api" {
   display_name        = "HelloWorld API"
   path                = "helloworld"
   protocols           = ["https"]
-  service_url         = azurerm_function_app.function.default_hostname
+  service_url         = "https://${azurerm_function_app.function.default_hostname}"
 }
