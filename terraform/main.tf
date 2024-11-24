@@ -59,7 +59,7 @@ resource "azurerm_api_management_api" "api" {
   display_name        = "HelloWorld API"
   path                = "helloworld"
   protocols           = ["https"]
-  service_url         = "https://${azurerm_function_app.function.default_hostname}"
+  service_url         = "https://${azurerm_function_app.function_app.default_hostname}"
 }
 
 # Outputs
